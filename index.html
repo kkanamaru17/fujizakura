@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fujizakura Kogen Bus Schedule</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin: 0;
+        }
+        #lang-toggle {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .search-form {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .search-form select, .search-form button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+        }
+        .search-form button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .search-form button:hover {
+            background-color: #2980b9;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        .result-item {
+            background-color: #f8f9fa;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .result-item p {
+            margin: 5px 0;
+        }
+        .result-item .time-info {
+            font-weight: bold;
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1 id="title">&#x1F68C; Bus Route Finder</h1>
+        <button id="lang-toggle">日本語</button>
+    </div>
+    <div class="search-form">
+        <select id="fromStop"></select>
+        <select id="toStop"></select>
+        <button id="find-routes-btn" onclick="findRoutes()">Find Routes</button>
+    </div>
+    <div id="results"></div>
+</div>
+
+<script>
+    const stops = [
+        { en: "JR Otsuki Station", jp: "JR大月駅" },
+        { en: "Kawaguchiko Station", jp: "河口湖駅" },
+        { en: "Kawaguchiko Shopping Center Bell", jp: "河口湖ショッピングセンター・ベル" },
+        { en: "Yamanashi Red Cross Hospital", jp: "山梨赤十字病院" },
+        { en: "Fuji Subaru Land", jp: "富士すばるランド" },
+        { en: "Keio 1st Entrance", jp: "京王1次入口" },
+        { en: "4th Subdivision", jp: "第4次分譲地" },
+        { en: "Marubeni Fujizakura Management Office", jp: "丸紅富士桜・管理事務所" },
+        { en: "Old 3rd Management Office", jp: "旧第3次管理事務所" },
+        { en: "Fuji Kanko Kaihatsu Co., Ltd. / Old Construction Division", jp: "富士観光開発(株)・旧建設課" },
+        { en: "1st Subdivision G Area Entrance", jp: "第1次分譲地G地区入口" },
+        { en: "1st Subdivision N Area Entrance", jp: "第1次分譲地N地区入口" },
+        { en: "Keio 2nd A", jp: "京王2次A" },
+        { en: "Keio 2nd B", jp: "京王2次B" },
+        { en: "Keio 2nd Management Office", jp: "京王2次管理事務所" },
+        { en: "8th Subdivision Entrance", jp: "第8次分譲地入口" },
+        { en: "Fujizakura Kogen Park Villa", jp: "富士桜高原パークヴィラ" }
+    ];
+
+    const timetable = [
+        // Route 1 (Right Loop)
+        { route: 1, stop: "Kawaguchiko Station", time: "09:30" },
+        { route: 1, stop: "Kawaguchiko Shopping Center Bell", time: "09:35" },
+        { route: 1, stop: "Yamanashi Red Cross Hospital", time: "09:40" },
+        { route: 1, stop: "Fuji Subaru Land", time: "09:45" },
+        { route: 1, stop: "Keio 1st Entrance", time: "09:50" },
+        { route: 1, stop: "Old 3rd Management Office", time: "09:52" },
+        { route: 1, stop: "Fuji Kanko Kaihatsu Co., Ltd. / Old Construction Division", time: "09:57" },
+        { route: 1, stop: "1st Subdivision G Area Entrance", time: "09:59" },
+        { route: 1, stop: "1st Subdivision N Area Entrance", time: "10:01" },
+        { route: 1, stop: "Keio 2nd A", time: "10:08" },
+        { route: 1, stop: "Keio 2nd B", time: "10:10" },
+        { route: 1, stop: "Keio 2nd Management Office", time: "10:12" },
+        { route: 1, stop: "8th Subdivision Entrance", time: "10:13" },
+        { route: 1, stop: "Fujizakura Kogen Park Villa", time: "10:15" },
+        { route: 1, stop: "Marubeni Fujizakura Management Office", time: "10:18" },
+        { route: 1, stop: "4th Subdivision", time: "10:21" },
+        { route: 1, stop: "Keio 1st Entrance", time: "10:23" },
+        { route: 1, stop: "Fuji Subaru Land", time: "10:28" },
+        { route: 1, stop: "Yamanashi Red Cross Hospital", time: "10:33" },
+        { route: 1, stop: "Kawaguchiko Shopping Center Bell", time: "10:38" },
+        { route: 1, stop: "Kawaguchiko Station", time: "10:43" },
+
+        // Route 2 (Left Loop)
+        { route: 2, stop: "Kawaguchiko Station", time: "11:20" },
+        { route: 2, stop: "Kawaguchiko Shopping Center Bell", time: "11:25" },
+        { route: 2, stop: "Yamanashi Red Cross Hospital", time: "11:30" },
+        { route: 2, stop: "Fuji Subaru Land", time: "11:35" },
+        { route: 2, stop: "Keio 1st Entrance", time: "11:40" },
+        { route: 2, stop: "4th Subdivision", time: "11:42" },
+        { route: 2, stop: "Marubeni Fujizakura Management Office", time: "11:45" },
+        { route: 2, stop: "Fujizakura Kogen Park Villa", time: "11:48" },
+        { route: 2, stop: "8th Subdivision Entrance", time: "11:50" },
+        { route: 2, stop: "Keio 2nd A", time: "11:54" },
+        { route: 2, stop: "Keio 2nd B", time: "11:56" },
+        { route: 2, stop: "Keio 2nd Management Office", time: "11:58" },
+        { route: 2, stop: "1st Subdivision N Area Entrance", time: "12:02" },
+        { route: 2, stop: "1st Subdivision G Area Entrance", time: "12:04" },
+        { route: 2, stop: "Fuji Kanko Kaihatsu Co., Ltd. / Old Construction Division", time: "12:06" },
+        { route: 2, stop: "Old 3rd Management Office", time: "12:11" },
+        { route: 2, stop: "Keio 1st Entrance", time: "12:13" },
+        { route: 2, stop: "Fuji Subaru Land", time: "12:18" },
+        { route: 2, stop: "Yamanashi Red Cross Hospital", time: "12:23" },
+        { route: 2, stop: "Kawaguchiko Shopping Center Bell", time: "12:28" },
+        { route: 2, stop: "Kawaguchiko Station", time: "12:33" },
+
+        // Route 3 (Right Loop)
+        { route: 3, stop: "Kawaguchiko Station", time: "13:40" },
+        { route: 3, stop: "Kawaguchiko Shopping Center Bell", time: "13:45" },
+        { route: 3, stop: "Yamanashi Red Cross Hospital", time: "13:50" },
+        { route: 3, stop: "Fuji Subaru Land", time: "13:55" },
+        { route: 3, stop: "Keio 1st Entrance", time: "14:00" },
+        { route: 3, stop: "Old 3rd Management Office", time: "14:02" },
+        { route: 3, stop: "Fuji Kanko Kaihatsu Co., Ltd. / Old Construction Division", time: "14:07" },
+        { route: 3, stop: "1st Subdivision G Area Entrance", time: "14:09" },
+        { route: 3, stop: "1st Subdivision N Area Entrance", time: "14:11" },
+        { route: 3, stop: "Keio 2nd A", time: "14:18" },
+        { route: 3, stop: "Keio 2nd B", time: "14:20" },
+        { route: 3, stop: "Keio 2nd Management Office", time: "14:22" },
+        { route: 3, stop: "8th Subdivision Entrance", time: "14:23" },
+        { route: 3, stop: "Fujizakura Kogen Park Villa", time: "14:25" },
+        { route: 3, stop: "Marubeni Fujizakura Management Office", time: "14:28" },
+        { route: 3, stop: "4th Subdivision", time: "14:31" },
+        { route: 3, stop: "Keio 1st Entrance", time: "14:33" },
+        { route: 3, stop: "Fuji Subaru Land", time: "14:38" },
+        { route: 3, stop: "Yamanashi Red Cross Hospital", time: "14:43" },
+        { route: 3, stop: "Kawaguchiko Shopping Center Bell", time: "14:48" },
+        { route: 3, stop: "Kawaguchiko Station", time: "14:53" },
+
+        // Route 4 (Left Loop)
+        { route: 4, stop: "JR Otsuki Station", time: "15:33" },
+        { route: 4, stop: "Kawaguchiko Station", time: "16:15" },
+        { route: 4, stop: "Kawaguchiko Shopping Center Bell", time: "16:20" },
+        { route: 4, stop: "Yamanashi Red Cross Hospital", time: "16:25" },
+        { route: 4, stop: "Fuji Subaru Land", time: "16:30" },
+        { route: 4, stop: "Keio 1st Entrance", time: "16:35" },
+        { route: 4, stop: "4th Subdivision", time: "16:37" },
+        { route: 4, stop: "Marubeni Fujizakura Management Office", time: "16:40" },
+        { route: 4, stop: "Fujizakura Kogen Park Villa", time: "16:43" },
+        { route: 4, stop: "8th Subdivision Entrance", time: "16:45" },
+        { route: 4, stop: "Keio 2nd A", time: "16:49" },
+        { route: 4, stop: "Keio 2nd B", time: "16:51" },
+        { route: 4, stop: "Keio 2nd Management Office", time: "16:53" },
+        { route: 4, stop: "1st Subdivision N Area Entrance", time: "16:57" },
+        { route: 4, stop: "1st Subdivision G Area Entrance", time: "16:59" },
+        { route: 4, stop: "Fuji Kanko Kaihatsu Co., Ltd. / Old Construction Division", time: "17:01" },
+        { route: 4, stop: "Old 3rd Management Office", time: "17:06" },
+        { route: 4, stop: "Fuji Subaru Land", time: "17:13" },
+        { route: 4, stop: "Yamanashi Red Cross Hospital", time: "17:18" },
+        { route: 4, stop: "Kawaguchiko Shopping Center Bell", time: "17:23" },
+        { route: 4, stop: "Kawaguchiko Station", time: "17:28" }
+    ];
+
+    const fromStopEl = document.getElementById('fromStop');
+    const toStopEl = document.getElementById('toStop');
+    const resultsEl = document.getElementById('results');
+    const langToggleBtn = document.getElementById('lang-toggle');
+    const titleEl = document.getElementById('title');
+    const findRoutesBtn = document.getElementById('find-routes-btn');
+
+    let currentLang = 'en';
+
+    const translations = {
+        en: {
+            title: "&#x1F68C; Bus Route Finder",
+            findRoutes: "Find Routes",
+            toggleLang: "日本語",
+            noDirectRoutes: "No direct routes found for the selected journey.",
+            pleaseSelect: "Please select different starting and ending points.",
+            travelTime: "Travel Time",
+            minutes: "minutes",
+            depart: "Depart",
+            arrive: "Arrive",
+            at: "at",
+            route: "Route",
+            rightLoop: "Right Loop",
+            leftLoop: "Left Loop"
+        },
+        jp: {
+            title: "&#x1F68C; バスルート検索",
+            findRoutes: "ルートを検索",
+            toggleLang: "English",
+            noDirectRoutes: "選択された経路の直接ルートが見つかりませんでした。",
+            pleaseSelect: "出発地と目的地を別に選択してください。",
+            travelTime: "所要時間",
+            minutes: "分",
+            depart: "出発",
+            arrive: "到着",
+            at: "に",
+            route: "ルート",
+            rightLoop: "右廻り",
+            leftLoop: "左廻り"
+        }
+    };
+
+    function populateDropdowns() {
+        fromStopEl.innerHTML = '';
+        toStopEl.innerHTML = '';
+        stops.forEach(stop => {
+            const option1 = document.createElement('option');
+            option1.value = stop.en;
+            option1.textContent = stop[currentLang];
+            fromStopEl.appendChild(option1);
+
+            const option2 = document.createElement('option');
+            option2.value = stop.en;
+            option2.textContent = stop[currentLang];
+            toStopEl.appendChild(option2);
+        });
+    }
+
+    function timeToMinutes(time) {
+        const [hours, minutes] = time.split(':').map(Number);
+        return hours * 60 + minutes;
+    }
+
+    function findRoutes() {
+        const from = fromStopEl.value;
+        const to = toStopEl.value;
+        resultsEl.innerHTML = '';
+
+        if (from === to) {
+            resultsEl.innerHTML = `<p>${translations[currentLang].pleaseSelect}</p>`;
+            return;
+        }
+
+        const validJourneys = [];
+
+        for (let i = 1; i <= 4; i++) { // Loop through each route
+            const routeData = timetable.filter(s => s.route === i);
+            
+            for (let fromIndex = 0; fromIndex < routeData.length; fromIndex++) {
+                if (routeData[fromIndex].stop === from) {
+                    for (let toIndex = fromIndex + 1; toIndex < routeData.length; toIndex++) {
+                        if (routeData[toIndex].stop === to) {
+                            const departure = routeData[fromIndex];
+                            const arrival = routeData[toIndex];
+                            const duration = timeToMinutes(arrival.time) - timeToMinutes(departure.time);
+                            const direction = (i === 1 || i === 3) ? translations[currentLang].rightLoop : translations[currentLang].leftLoop;
+
+                            validJourneys.push({ 
+                                route: i, 
+                                direction,
+                                departure: departure.time, 
+                                arrival: arrival.time, 
+                                duration 
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        if (validJourneys.length === 0) {
+            resultsEl.innerHTML = `<p>${translations[currentLang].noDirectRoutes}</p>`;
+            return;
+        }
+
+        validJourneys.sort((a, b) => a.duration - b.duration);
+
+        validJourneys.forEach(journey => {
+            const fromStopName = stops.find(s => s.en === from)[currentLang];
+            const toStopName = stops.find(s => s.en === to)[currentLang];
+            const item = document.createElement('div');
+            item.className = 'result-item';
+            item.innerHTML = `
+                <p><strong>${translations[currentLang].route} ${journey.route} (${journey.direction})</strong></p>
+                <p><strong>${translations[currentLang].travelTime}:</strong> ${journey.duration} ${translations[currentLang].minutes}</p>
+                <p><span class="time-info">${translations[currentLang].depart}:</span> ${fromStopName} ${translations[currentLang].at} ${journey.departure}</p>
+                <p><span class="time-info">${translations[currentLang].arrive}:</span> ${toStopName} ${translations[currentLang].at} ${journey.arrival}</p>
+            `;
+            resultsEl.appendChild(item);
+        });
+    }
+
+    function toggleLanguage() {
+        currentLang = currentLang === 'en' ? 'jp' : 'en';
+        updateUI();
+    }
+
+    function updateUI() {
+        titleEl.innerHTML = translations[currentLang].title;
+        findRoutesBtn.textContent = translations[currentLang].findRoutes;
+        langToggleBtn.textContent = translations[currentLang].toggleLang;
+        populateDropdowns();
+        resultsEl.innerHTML = '';
+    }
+
+    langToggleBtn.addEventListener('click', toggleLanguage);
+
+    window.onload = updateUI;
+
+</script>
+
+</body>
+</html>

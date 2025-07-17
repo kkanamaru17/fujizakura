@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fujizakura Kogen Bus Schedule</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            padding: 30px;
+            border: 1px solid #e1e8ed;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #e1e8ed;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin: 0;
+        }
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin: 5px 0 0;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .section-title {
+            font-size: 1.5em;
+            color: #34495e;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .section-title span {
+            margin-right: 10px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e1e8ed;
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #2980b9;
+        }
+        .card p {
+            margin-bottom: 0;
+            line-height: 1.6;
+        }
+        .important-notes ul {
+            list-style: none;
+            padding: 0;
+        }
+        .important-notes li {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .important-notes li span {
+            font-size: 1.5em;
+            margin-right: 15px;
+            color: #c0392b;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e1e8ed;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>&#x1F68C; Fujizakura Kogen Bus Schedule</h1>
+            <p>At a Glance (Effective: July 1, 2024)</p>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title"><span>&#x23F0;</span>Daily Departures from Kawaguchiko Stn.</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Route 1 (Right Loop)</h3>
+                    <p><strong>Departure:</strong> 9:30 AM</p>
+                </div>
+                <div class="card">
+                    <h3>Route 2 (Left Loop)</h3>
+                    <p><strong>Departure:</strong> 11:20 AM</p>
+                </div>
+                <div class="card">
+                    <h3>Route 3 (Right Loop)</h3>
+                    <p><strong>Departure:</strong> 1:40 PM</p>
+                </div>
+                <div class="card">
+                    <h3>Route 4 (Left Loop)</h3>
+                    <p><strong>Departure:</strong> 4:15 PM</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title"><span>&#x26A0;&#xFE0F;</span>Important Information</h2>
+            <div class="important-notes">
+                <ul>
+                    <li><span>&#x1F6B6;</span>For Villa Residents Only.</li>
+                    <li><span>&#x23F3;</span>Schedule may change due to weather or traffic.</li>
+                    <li><span>&#x1F4C5;</span>One stop is seasonal (April 1 - Nov 30).</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title"><span>&#x23F1;&#xFE0F;</span>Quickest Route to the Villa</h2>
+            <div class="card" style="background-color: #e8f6f3;">
+                 <h3>Take the Left Loop!</h3>
+                 <p>To get from <strong>Kawaguchiko Station</strong> to the <strong>Fujizakura Kogen Park Villa</strong> stop, the <strong>Left Loop</strong> is faster (~28 minutes) compared to the Right Loop (~45 minutes).</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Contact:</strong> Fujizakura Kogen Villa Management Office | &#x260E;&#xFE0F; 0555-86-3211</p>
+        </div>
+    </div>
+</body>
+</html>
